@@ -39,7 +39,7 @@
 
 \begin{document}
 
-\title{Detacting change points}
+\title{Ad-hoc Teamwork: Change-Points Detection}
 
 
 
@@ -51,7 +51,13 @@
 
 \begin{abstract} 
 
-In many setting agents are required to communicate with other agents whom their type they are unfamiliar with. By maintaining beliefs over a set of hypothetical behaviors, or types an agent can improve its interaction with other agents in order to achieve a common goal. Many work already investigated ways to correctly and efficiently calculate the relatively likelihood of an agent's type as well as the values of any bounded continuous parameters within types. Those work all assumed stationarity (i.e., types does not change during time). The assumption of stationarity, even-though suitable for number of realistic scenarios, is a very strong assumption which can not be guarantied in many real world settings. In this work however, we are investigating settings in which an agent can change its type during the mission to be accomplished. Allowing the different agents change their types add complexity to the planning problem as now an agent need to recognize that a change have occur in addition to figuring out what is the new type of the agent it is interact with. We are offering a new way,  an improved version of the change point detection algorithm CHAMP, to track change points during the performances of a joint task. The proposed method is evaluated in detailed experiments...TO COMPLETE WHAT ARE OUR EXPERIMENTS.
+In many setting agents are required to communicate with other agents whom their type they are unfamiliar with. By maintaining beliefs over a set of hypothetical behaviors, or types an agent can improve its interaction with other agents in order to achieve a common goal. Many work already investigated ways to correctly and efficiently calculate the relatively likelihood of an agent's type as well as the values of any bounded continuous parameters within types. Those work all assumed stationarity (i.e., agents' types does not change during time). The assumption of stationarity, even-though suitable for number of realistic scenarios, is a very strong assumption which can not be guarantied in many real world settings. In this work however, we are investigating settings in which an agent can change its type during the mission to be accomplished. Allowing the different agents change their types add complexity to the planning problem as now an agent need to recognize that a change have occur in addition to figuring out what is the new type of the agent it is interact with.\\
+From here on we need to decide what is our direction/s:
+\begin{itemize}
+	\item \textbf{Change-point detection algorithms Comparison:} We will test two existing change-point detection algorithms (Fearnhead and Liu and ???) to track change-points during a performances of a joint task. We will describe both algorithms, will note their strengths and weaknesses and will present a compression between their capabilities.
+	\item \textbf{Domains compassion:} We will use only Fearnhead and Liu's algorithm but will perform it both on our current domain and on additional domain, comparing the results achieve it them both and analyze the differences.
+	\item \textbf{Finding heuristics for setting change points:} We will present two or more heuristics in order to set change points and will compare the results achieved for each of them.
+	\end{itemize}
 \end{abstract}
 
 
@@ -73,24 +79,22 @@ Our goal is to devise a method which allows agent $i$ to be able both to identif
 
 \section{Analysis}
 \subsection{Changepoint Detection Method}
-First, we describe the CHAMP algorithm (\textbf{Ch}angepoint detection using \textbf{A}pproximate \textbf{M}odel \textbf{P}arameters) presented by Niekum et al. \cite{niekum2014champ}. CHAMP is an algorithm for online Bayesian changepoint detection in settings where it is difficult or undesirable to integrate over the parameters of candidate models. The CHAMP algorithm was presented as an improvement of the online MAP (maximum a posteriori) changepoint detection model of Fearnhead and Liu \cite{fearnhead2007line}. In order to allow finding changepoint in cases where the parameters of the underlying model can not be marginalized CHAMP allows the use of models of any form, in which parameter estimates are available via means such as maximum likelihood fit, MCMC, or sample consensus methods. CHAMP requires three main changes from the work of Fearnhead and Liu: (i) \textit{Approximate model evidence}- instead of calculating directly model evidence for each segment by integrating over the parameters of candidate models they used the Bayesian Information Criterion (BIC) in order to approximate it; (ii) \textit{Minimum segment length}- since the model evidence was no longer well-defined a minimum segment length, $\alpha$, was chosen for all models (i.e., changepoints can only begin to be considered at time $t = 2\alpha$); (iii) \textit{Particle definition}- they revised the definition of a particle such that each particle also include the model relevant to each time step. 
+%First, we describe the CHAMP algorithm (\textbf{Ch}angepoint detection using \textbf{A}pproximate \textbf{M}odel \textbf{P}arameters) presented by Niekum et al. \cite{niekum2014champ}. CHAMP is an algorithm for online Bayesian changepoint detection in settings where it is difficult or undesirable to integrate over the parameters of candidate models. The CHAMP algorithm was presented as an improvement of the online MAP (maximum a posteriori) changepoint detection model of Fearnhead and Liu \cite{fearnhead2007line}. In order to allow finding changepoint in cases where the parameters of the underlying model can not be marginalized CHAMP allows the use of models of any form, in which parameter estimates are available via means such as maximum likelihood fit, MCMC, or sample consensus methods. CHAMP requires three main changes from the work of Fearnhead and Liu: (i) \textit{Approximate model evidence}- instead of calculating directly model evidence for each segment by integrating over the parameters of candidate models they used the Bayesian Information Criterion (BIC) in order to approximate it; (ii) \textit{Minimum segment length}- since the model evidence was no longer well-defined a minimum segment length, $\alpha$, was chosen for all models (i.e., changepoints can only begin to be considered at time $t = 2\alpha$); (iii) \textit{Particle definition}- they revised the definition of a particle such that each particle also include the model relevant to each time step. 
 
-\subsection{The TCD (Types Changepoint Detection) Algorithm}
-In our case, however, the parameters of the underlying model can be marginalized. This means that both the first and second adjustments required in CHAMP is not required in our case. On the other hand some additional improvement can be made in order to achieve better results and decrease calculation time and complexity:
+First, we describe the changepoint detection model of Fearnhead and Liu \cite{fearnhead2007line}. ***---TO BE DESCRIBED HERE***
+%In our case, however, the parameters of the underlying model can be marginalized. This means that both the first and second adjustments required in CHAMP is not required in our case. On the other hand some additional improvement can be made in order to achieve better results and decrease calculation time and complexity:
 
-\begin{itemize}
-	\item Use real likelihood instead of approximate likelihood. Up until now  
-	\item We correct the existing approach such that it will start each segment with random prior instead of prior that is being influenced by the results from the last segment (since the segment is not Dependant in each other).
-\end{itemize}
-
-***TODO: DESCRIBED \textbf{TCD} AND GIVE A PSEUDO CODE FOR IT***
+%\begin{itemize}
+%	\item Use real likelihood instead of approximate likelihood. Up until now  
+%	\item We correct the existing approach such that it will start each segment with random prior instead of prior that is being influenced by the results from the last segment (since the segment is not Dependant in each other).
+%\end{itemize}
 
 
 %To discuss the optimal set of time point in which the changes occur.
  
 
 \section{Experimental Evaluation}
-We provide a detailed experimental evaluation of our \textbf{TCD} in the level-based foraging domain \cite{albrecht2013game}, which was introduced as a test domain for ad hoc teamwork \cite{stone2010ad}. 
+We provide a detailed experimental evaluation of the proposed method in the level-based foraging domain \cite{albrecht2013game}, which was introduced as a test domain for ad hoc teamwork \cite{stone2010ad}. 
 
 
 
@@ -105,9 +109,8 @@ We provide a detailed experimental evaluation of our \textbf{TCD} in the level-b
 \end{itemize}
 
 \section{Related work}
-cnclkcm
+
 \section{Conclusions}
-cneqioecoida
 
 
 
