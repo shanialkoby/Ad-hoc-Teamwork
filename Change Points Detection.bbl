@@ -1,0 +1,36 @@
+\begin{thebibliography}{1}
+
+\bibitem{albrecht2013game}
+Stefano~V Albrecht and Subramanian Ramamoorthy.
+\newblock A game-theoretic model and best-response learning method for ad hoc
+  coordination in multiagent systems.
+\newblock In {\em Proceedings of the 2013 international conference on
+  Autonomous agents and multi-agent systems}, pages 1155--1156. International
+  Foundation for Autonomous Agents and Multiagent Systems, 2013.
+
+\bibitem{albrecht2017reasoning}
+Stefano~V Albrecht and Peter Stone.
+\newblock Reasoning about hypothetical agent behaviours and their parameters.
+\newblock In {\em Proceedings of the 16th Conference on Autonomous Agents and
+  MultiAgent Systems}, pages 547--555. International Foundation for Autonomous
+  Agents and Multiagent Systems, 2017.
+
+\bibitem{fearnhead2007line}
+Paul Fearnhead and Zhen Liu.
+\newblock On-line inference for multiple changepoint problems.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
+  Methodology)}, 69(4):589--605, 2007.
+
+\bibitem{niekum2014champ}
+Scott Niekum, Sarah Osentoski, Christopher~G Atkeson, and Andrew~G Barto.
+\newblock Champ: Changepoint detection using approximate model parameters.
+\newblock Technical report, CARNEGIE-MELLON UNIV PITTSBURGH PA ROBOTICS INST,
+  2014.
+
+\bibitem{stone2010ad}
+Peter Stone, Gal~A Kaminka, Sarit Kraus, Jeffrey~S Rosenschein, et~al.
+\newblock Ad hoc autonomous agent teams: Collaboration without
+  pre-coordination.
+\newblock In {\em AAAI}, 2010.
+
+\end{thebibliography}
