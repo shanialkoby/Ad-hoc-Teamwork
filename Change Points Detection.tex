@@ -16,7 +16,7 @@
 \usepackage{algorithm}
 \usepackage[noend]{algorithmic}
 \usepackage{tabularx} 
-
+\usepackage{color} 
 
 \usepackage[font=small]{caption}
 
@@ -78,36 +78,82 @@ To simplify the exposition, we assume that we control a single agent, $i$, which
 Our goal is to devise a method which allows agent $i$ to be able both to identify the specific time point in which the change in agent $j$'s type has occur and its new type, based only on agent $j$'s observed actions.
 
 \section{Analysis}
-\subsection{Changepoint Detection Method}
-%First, we describe the CHAMP algorithm (\textbf{Ch}angepoint detection using \textbf{A}pproximate \textbf{M}odel \textbf{P}arameters) presented by Niekum et al. \cite{niekum2014champ}. CHAMP is an algorithm for online Bayesian changepoint detection in settings where it is difficult or undesirable to integrate over the parameters of candidate models. The CHAMP algorithm was presented as an improvement of the online MAP (maximum a posteriori) changepoint detection model of Fearnhead and Liu \cite{fearnhead2007line}. In order to allow finding changepoint in cases where the parameters of the underlying model can not be marginalized CHAMP allows the use of models of any form, in which parameter estimates are available via means such as maximum likelihood fit, MCMC, or sample consensus methods. CHAMP requires three main changes from the work of Fearnhead and Liu: (i) \textit{Approximate model evidence}- instead of calculating directly model evidence for each segment by integrating over the parameters of candidate models they used the Bayesian Information Criterion (BIC) in order to approximate it; (ii) \textit{Minimum segment length}- since the model evidence was no longer well-defined a minimum segment length, $\alpha$, was chosen for all models (i.e., changepoints can only begin to be considered at time $t = 2\alpha$); (iii) \textit{Particle definition}- they revised the definition of a particle such that each particle also include the model relevant to each time step. 
+We will first describe two change-point detection existing algorithms.
+\subsection{Maximum A-Posteriori}
+The first one was presented by Fearnhead and Liu \cite{fearnhead2007line}. The model of Fearnhead and Liu assumes a time-series observations $y_{1:n} = (y_1, y_2, . . . , y_n)$ and a set of
+candidate models $Q$. The goal is to infer the MAP (Maximum A-Posteriori) set of change-points times $c_1, c_2, . . . , c_m$, where $c_0 = 0$ and $c_{m+1} = n$ (i.e., there exist $m + 1$ segments). Therefore, the observations $y_{c_i+1:c_{i+1}}$ creating the $i$th segment associated the model $q_i \in Q$ and parameters $\theta_i$.
 
-First, we describe the changepoint detection model of Fearnhead and Liu \cite{fearnhead2007line}. ***---TO BE DESCRIBED HERE***
-%In our case, however, the parameters of the underlying model can be marginalized. This means that both the first and second adjustments required in CHAMP is not required in our case. On the other hand some additional improvement can be made in order to achieve better results and decrease calculation time and complexity:
+The basic assumption in this model is that data after a change-point is independent of data prior to that change-point. Thus, we can model the change-point positions as a Markov chain in which the transition probabilities are defined by the time since the last change-point in the following way:
 
-%\begin{itemize}
-%	\item Use real likelihood instead of approximate likelihood. Up until now  
-%	\item We correct the existing approach such that it will start each segment with random prior instead of prior that is being influenced by the results from the last segment (since the segment is not Dependant in each other).
-%\end{itemize}
+\begin{equation}
+Pr(c_i+1 = t|c_i = s) = g(t - s)
+\end{equation}
+
+where $g(x)$ is a probability distribution over time and $G(x)$ is its cumulative distribution function.
+
+Given a segment from time s to t and a model q, define the model 
+
+The model evidence for a model $q$ and a given segment starting from a time point $s$ and ending at a time point $t$ is defined by:
+
+\begin{equation}
+L(s,t,q) = Pr(y_{s+1:t}|q) = \int Pr(y_{s+1:t}|q,\Theta)Pr(\theta)d\theta 
+\end{equation}
+
+We will denote the event that a change-point will occur at time $t$ by $\psi_j$ and the event that given a change-point at time $j$, the MAP choice of change-points has occurred prior to time $j$ by $\omega_j$. We can now use the following notations:
+
+\begin{equation}
+Pr_t(j,q) = Pr(FC_t=j,q,\omega_j,y_{1:t})
+\end{equation}
+
+\begin{equation}
+P^{MAP}_t= Pr(\psi_j,\omega_j,y_{1:t})
+\end{equation}
+
+Where $FC_t$ is the distribution over the position of the first change-point prior to time $t$ which can be efficiently estimate using the standard Bayesian filtering recursions and an on-line Viterbi algorithm \cite{fearnhead2007line}.
+
+A development of the above equation will result in:
+
+\begin{equation}
+Pr_t(j,q) = (1-G(t-j-1))L(j,t,q)Pr(q)P_j^{MAP}
+\end{equation}
+
+\begin{equation*}\label{P^MAP2}
+P^{MAP}_t=\substack{max\\j,q}\Big{[}\frac{g(t-j)}{1-G(t-j-1)}Pr_t(j,q)\Big{]}
+\end{equation*}
+
+Finally, the Viterbi path can be recovered by finding the $j$ and $q$ values that maximize \eqref{P^MAP2} at time $t$. We then can repeat the process again in order to find the values which maximize  \eqref{P^MAP2} at time $j$ or any time point beforehand until reaching zero.
 
 
-%To discuss the optimal set of time point in which the changes occur.
+The algorithm is fully online, but requires O(n) computation at each time step, since Pt(j, q) values
+must be calculated for all j < t. To reduce computation time to a constant, ideas from particle
+filtering can be leveraged to keep only a constant number of particles, M, at each time step, each
+of which represent a support point in the approximate density p(Ct = j, y1:t). At each time step,
+if the number of particles exceeds M, stratified optimal resampling [5] can be used to choose which
+particles to keep in a manner that minimizes the KL divergence from the true distribution in
+expectation.
+
+\subsection{CHAMP Algorithm}
+CHAMP algorithm (\textbf{Ch}angepoint detection using \textbf{A}pproximate \textbf{M}odel \textbf{P}arameters) was presented by Niekum et al. \cite{niekum2014champ}. CHAMP is an algorithm for on-line Bayesian change-point detection intended for settings where it is difficult or undesirable to integrate over the parameters of candidate models. For those settings, CHAMP algorithm can be consider as an improvement of the on-line MAP algorithm. In order to allow finding change-point in cases where the parameters of the underlying model can not be marginalized CHAMP allows the use of models of any form, in which parameter estimates are available via means such as maximum likelihood fit, MCMC, or sample consensus methods. CHAMP requires three main changes from the work of Fearnhead and Liu: (i) \textit{Approximate model evidence}- instead of calculating directly model evidence for each segment by integrating over the parameters of candidate models they used the Bayesian Information Criterion (BIC) in order to approximate it; (ii) \textit{Minimum segment length}- since the model evidence is no longer well-defined a minimum segment length, $\alpha$, is chosen for all models (i.e., change-points can only begin to be considered at time $t = 2\alpha$); (iii) \textit{Particle definition}- a revised definition of a particle is offered such that each particle also include the model relevant to each time step. 
  
 
 \section{Experimental Evaluation}
 We provide a detailed experimental evaluation of the proposed method in the level-based foraging domain \cite{albrecht2013game}, which was introduced as a test domain for ad hoc teamwork \cite{stone2010ad}. 
+\color{red}***Manish - please provide a description of the domain we used, the agent's different types, the different experiments that we performed (or intended to perform- write down the experiment even if we still don't have results). As I recall we have 2 experiments without change-points and 4 experiments with change points. In case that we already have results, please describe it. In addition, can you please write down the explanation to why we removed the use in CHAMP from the inner loop.***
 
 
-
+\color{black}
 \begin{itemize}
 	\item We will compare the following four cases: 	\begin{enumerate}
 		\item \textbf{Perfect Information} - whenever agent $j$ changes its type it reveal its new type (i.e., agent $i$ knows that agent $j$ changed its type and also knows what the new type is).
 		\item \textbf{No Changes Allowed} - agent $i$ knows agent $j$'s initial type but assumes that no changes of type are allowed/possible.
 		\item \textbf{Stationary Types} - no change of type is being allowed, Agents have the same type during the whole process (Using Stefano's method in order to figure out $j$'s type).
-		\item \textbf{Dynamic Types} - agent $j$ can change its type without revealing it to agent $i$ which will use \textbf{TCD} in order to identify changepoints.
+		\item \textbf{Dynamic Types} - agent $j$ can change its type without revealing it to agent $i$ which will use a combination of CHAMP and Fearnhead and Liu's algorithm in order to identify change-points.
 	\end{enumerate}
 	We note that the Monte Carlo Tree Search (MCTS) planning algorithm was used in each time step in order to compute optimal actions with respect to the agent's beliefs and types.
 \end{itemize}
 
+\section{Performance Improvement Using Designated Change-Points}
+Up until now no special attention has been given to the question of how should an agent choose its change-points in order to improve the performance of the overall task. In this section we will propose possible heuristic to finding the optimal set of change-points during a given task. We note that since no real planning is possible due to the ad-hoc nature of the team, we will only try to find a specific agent's set of change-points assuming that the rest of the agents are not aware to those changing point.
 \section{Related work}
 
 \section{Conclusions}
